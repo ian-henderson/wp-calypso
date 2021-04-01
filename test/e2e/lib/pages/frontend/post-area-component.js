@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { By } from 'selenium-webdriver';
+import { By, until } from 'selenium-webdriver';
 
 /**
  * Internal dependencies
@@ -18,5 +18,21 @@ export default class PostAreaComponent extends AsyncBaseContainer {
 		const postSelector = By.css( '.post .entry-content' );
 		await driverHelper.waitTillPresentAndDisplayed( this.driver, postSelector );
 		return await this.driver.findElement( postSelector ).getAttribute( 'innerHTML' );
+	}
+
+	async likePost() {
+		const iFrame = By.css( 'iframe.post-likes-widget' );
+		const likeButton = By.css( '.like.sd-button' );
+
+		await this.driver.switchTo().defaultContent();
+		await driverHelper.waitTillPresentAndDisplayed( this.driver, iFrame );
+		await this.driver.wait(
+			until.ableToSwitchToFrame( iFrame ),
+			this.explicitWaitMS,
+			'Could not switch to post like widget iFrame'
+		);
+
+		await driverHelper.scrollIntoView( this.driver, likeButton );
+		await driverHelper.clickWhenClickable( this.driver, likeButton );
 	}
 }
