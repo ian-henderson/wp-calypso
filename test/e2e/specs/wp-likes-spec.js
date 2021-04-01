@@ -9,6 +9,7 @@ import config from 'config';
 import * as driverManager from '../lib/driver-manager';
 import * as dataHelper from '../lib/data-helper';
 import LoginFlow from '../lib/flows/login-flow';
+import PostAreaComponent from '../lib/pages/frontend/post-area-component';
 import CommentsAreaComponent from '../lib/pages/frontend/comments-area-component';
 import GutenbergEditorComponent from '../lib/gutenberg/gutenberg-editor-component';
 
@@ -43,23 +44,22 @@ describe( `[${ host }] Likes: (${ screenSize })`, function () {
 			await gEditorComponent.publish( { visit: true } );
 		} );
 
-		// step( 'Like post', async function () {
-		// 	const postArea = await PostAreaComponent.Expect( driver );
-		// 	return await postArea._likePost();
-		// } );
+		step( 'Like post', async function () {
+			const postArea = await PostAreaComponent.Expect( driver );
+			return await postArea.likePost();
+		} );
 
-		step( 'Post a comment', async function () {
+		step( 'Post comment and like it', async function () {
 			const commentArea = await CommentsAreaComponent.Expect( driver );
-			return await commentArea._postComment( {
-				comment: dataHelper.randomPhrase(),
+			const comment = dataHelper.randomPhrase();
+
+			await commentArea._postComment( {
+				comment: comment,
 				name: 'e2eTestName',
 				email: 'e2eTestName@test.com',
 			} );
-		} );
 
-		// step( 'Like comment', async function () {
-		// 	const commentArea = await CommentAreaComponent.Expect( driver );
-		// 	return await commentArea._likecomment();
-		// } );
+			return await commentArea.likeComment( comment );
+		} );
 	} );
 } );
