@@ -23,6 +23,7 @@ export default class PostAreaComponent extends AsyncBaseContainer {
 	async likePost() {
 		const iFrame = By.css( 'iframe.post-likes-widget' );
 		const likeButton = By.css( '.like.sd-button' );
+		const postLikedText = By.xpath( `//span[@class='wpl-count-text'][.='You like this.']` );
 
 		await this.driver.switchTo().defaultContent();
 		await driverHelper.waitTillPresentAndDisplayed( this.driver, iFrame );
@@ -34,5 +35,7 @@ export default class PostAreaComponent extends AsyncBaseContainer {
 
 		await driverHelper.scrollIntoView( this.driver, likeButton );
 		await driverHelper.clickWhenClickable( this.driver, likeButton );
+		await driverHelper.waitTillPresentAndDisplayed( this.driver, postLikedText );
+		await this.driver.switchTo().defaultContent();
 	}
 }

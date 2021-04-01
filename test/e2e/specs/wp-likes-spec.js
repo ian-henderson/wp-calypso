@@ -31,16 +31,12 @@ describe( `[${ host }] Likes: (${ screenSize })`, function () {
 	} );
 
 	describe( 'Like posts and comments @parallel', function () {
-		step( 'Login and create a new post', async function () {
-			this.loginFlow = new LoginFlow( driver );
-			await this.loginFlow.loginAndStartNewPost( 'e2eflowtestinglikessimple.wordpress.com', true );
+		step( 'Login, create a new post and view it', async function () {
+			this.loginFlow = new LoginFlow( driver, 'louisTestUser' ); // tofix: switch to e.g. gutenbergSimpleSiteUser
+			await this.loginFlow.loginAndStartNewPost( 'c3polikes.blog', true );
 			const gEditorComponent = await GutenbergEditorComponent.Expect( driver );
 			await gEditorComponent.enterTitle( blogPostTitle );
-			return await gEditorComponent.enterText( blogPostQuote );
-		} );
-
-		step( 'Publish and visit new post', async function () {
-			const gEditorComponent = await GutenbergEditorComponent.Expect( driver );
+			await gEditorComponent.enterText( blogPostQuote );
 			await gEditorComponent.publish( { visit: true } );
 		} );
 
@@ -49,8 +45,9 @@ describe( `[${ host }] Likes: (${ screenSize })`, function () {
 			return await postArea.likePost();
 		} );
 
-		step( 'Post comment and like it', async function () {
+		step( 'Post and like comment', async function () {
 			const commentArea = await CommentsAreaComponent.Expect( driver );
+
 			const comment = dataHelper.randomPhrase();
 
 			await commentArea._postComment( {
