@@ -31,8 +31,8 @@ describe( `[${ host }] Likes: (${ screenSize })`, function () {
 
 	describe( 'Like posts and comments @parallel', function () {
 		step( 'Login and create a new post', async function () {
-			this.loginFlow = new LoginFlow( driver, 'gutenbergSimpleSiteUser' );
-			await this.loginFlow.loginAndStartNewPost( null, true );
+			this.loginFlow = new LoginFlow( driver );
+			await this.loginFlow.loginAndStartNewPost( 'e2eflowtestinglikessimple.wordpress.com', true );
 			const gEditorComponent = await GutenbergEditorComponent.Expect( driver );
 			await gEditorComponent.enterTitle( blogPostTitle );
 			return await gEditorComponent.enterText( blogPostQuote );
