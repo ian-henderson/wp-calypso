@@ -32,8 +32,9 @@ describe( `[${ host }] Likes: (${ screenSize })`, function () {
 
 	describe( 'Like posts and comments @parallel', function () {
 		step( 'Login, create a new post and view it', async function () {
-			this.loginFlow = new LoginFlow( driver, 'louisTestUser' ); // tofix: switch to e.g. gutenbergSimpleSiteUser
-			await this.loginFlow.loginAndStartNewPost( 'c3polikes.blog', true );
+			this.loginFlow = new LoginFlow( driver, 'gutenbergSimpleSiteUser' );
+			await this.loginFlow.loginAndStartNewPost( null, true );
+
 			const gEditorComponent = await GutenbergEditorComponent.Expect( driver );
 			await gEditorComponent.enterTitle( blogPostTitle );
 			await gEditorComponent.enterText( blogPostQuote );
