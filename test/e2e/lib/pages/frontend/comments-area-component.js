@@ -62,18 +62,4 @@ export default class CommentsAreaComponent extends AsyncBaseContainer {
 			'Could not switch to comment form iFrame'
 		);
 	}
-
-	async likeComment( comment ) {
-		const commentLikeLink = By.xpath(
-			`//div[@class='comment-content']/p[.='${ comment }']/../p/a[@class='comment-like-link']`
-		);
-		const commentLikedText = By.xpath(
-			`//div[@class='comment-content']/p[.='${ comment }']/../p/span[starts-with(text(),'Liked by')]`
-		);
-
-		await this.driver.switchTo().defaultContent();
-		await driverHelper.scrollIntoView( this.driver, commentLikeLink, 'end' );
-		await driverHelper.clickWhenClickable( this.driver, commentLikeLink );
-		await driverHelper.waitTillPresentAndDisplayed( this.driver, commentLikedText );
-	}
 }
