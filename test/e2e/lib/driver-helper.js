@@ -567,3 +567,11 @@ export async function waitTillTextPresent( driver, selector, text, waitOverride 
 		`Timed out waiting for element with ${ selector.using } of '${ selector.value }' to be present and displayed with text '${ text }'`
 	);
 }
+
+export async function waitTillAbleToSwitchToFrame( driver, selector, text, waitOverride ) {
+	const timeoutWait = waitOverride ? waitOverride : explicitWaitMS;
+	const timeoutText = text
+		? text
+		: `Timed out wiating to be able to switch to IFrame with ${ selector.using } of ${ selector.value }`;
+	return driver.wait( until.ableToSwitchToFrame( selector ), timeoutWait, timeoutText );
+}
