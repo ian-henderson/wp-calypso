@@ -14,6 +14,10 @@ import LoginFlow from '../lib/flows/login-flow';
 import PostAreaComponent from '../lib/pages/frontend/post-area-component';
 import CommentsAreaComponent from '../lib/pages/frontend/comments-area-component';
 import GutenbergEditorComponent from '../lib/gutenberg/gutenberg-editor-component';
+import ProfilePage from '../lib/pages/profile-page';
+import NavBarComponent from '../lib/components/nav-bar-component.js';
+import LoggedOutMasterbarComponent from '../lib/components/logged-out-masterbar-component';
+import AsyncBaseContainer from '../lib/async-base-container';
 
 const host = dataHelper.getJetpackHost();
 const screenSize = driverManager.currentScreenSize();
@@ -25,6 +29,7 @@ const blogPostQuote =
 
 describe( `[${ host }] Likes: (${ screenSize })`, function () {
 	let driver;
+	let postUrl;
 	this.timeout( mochaTimeoutMS );
 
 	before( 'Start browser', async function () {
@@ -40,7 +45,7 @@ describe( `[${ host }] Likes: (${ screenSize })`, function () {
 			const gEditorComponent = await GutenbergEditorComponent.Expect( driver );
 			await gEditorComponent.enterTitle( blogPostTitle );
 			await gEditorComponent.enterText( blogPostQuote );
-			await gEditorComponent.publish( { visit: true } );
+			postUrl = await gEditorComponent.publish( { visit: true } );
 		} );
 
 		step( 'Like post', async function () {
@@ -77,10 +82,43 @@ describe( `[${ host }] Likes: (${ screenSize })`, function () {
 				`//div[@class='comment-content']/p[.='${ comment }']/../p/span[starts-with(text(),'Liked by')]`
 			);
 
-			await this.driver.switchTo().defaultContent();
-			await driverHelper.scrollIntoView( this.driver, commentLikeLink, 'end' );
-			await driverHelper.clickWhenClickable( this.driver, commentLikeLink );
-			await driverHelper.waitTillPresentAndDisplayed( this.driver, commentLikedText );
+			await driver.switchTo().defaultContent();
+			await driverHelper.scrollIntoView( driver, commentLikeLink, 'end' );
+			await driverHelper.clickWhenClickable( driver, commentLikeLink );
+			await driverHelper.waitTillPresentAndDisplayed( driver, commentLikedText );
+		} );
+
+		describe( 'Like from logged out', function () {
+			step( 'View profile to log out', async function () {
+				const navbarComponent = await NavBarComponent.Expect( driver );
+				await navbarComponent.clickProfileLink();
+			} );
+
+			step( 'Logout from profile page', async function () {
+				const profilePage = await ProfilePage.Expect( driver );
+				await profilePage.clickSignOut();
+			} );
+
+			step( 'See wordpress.com home when after logging out', async function () {
+				return await LoggedOutMasterbarComponent.Expect( driver );
+			} );
+
+			step( 'Like post as logged out user', async function () {
+				const iFrame = By.css( 'iframe.post-likes-widget' );
+				const postLikesArea = new AsyncBaseContainer( driver, iFrame, postUrl );
+				postLikesArea._visitInit();
+
+				const likeButton = By.css( '.like.sd-button' );
+				const postLikedText = By.xpath( `//span[@class='wpl-count-text'][.='You like this.']` );
+
+				await driver.switchTo().defaultContent();
+				await driverHelper.waitTillPresentAndDisplayed( driver, iFrame );
+				await driverHelper.waitTillAbleToSwitchToFrame( driver, iFrame );
+				await driverHelper.scrollIntoView( driver, likeButton );
+				await driverHelper.clickWhenClickable( driver, likeButton );
+				await driverHelper.waitTillPresentAndDisplayed( driver, postLikedText );
+				await driver.switchTo().defaultContent();
+			} );
 		} );
 	} );
 } );
